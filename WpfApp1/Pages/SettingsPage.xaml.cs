@@ -1,28 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace WpfApp1.Pages
 {
-    /// <summary>
-    /// SettingsPage.xaml 的交互逻辑
-    /// </summary>
-    public partial class SettingsPage : Page
-    {
-        public SettingsPage()
-        {
-            InitializeComponent();
-        }
-    }
+	public partial class SettingsPage : Page
+	{
+		private Settings _settings;
+
+		public SettingsPage()
+		{
+			InitializeComponent();
+			_settings = Settings.LoadSettings();
+			AudioPathTextBox.Text = _settings.AudioPath;
+			VolumeSlider.Value = _settings.Volume;
+		}
+
+		private void BrowseAudioPath_Click(object sender, RoutedEventArgs e)
+		{
+			var dialog = new OpenFileDialog
+			{
+				Filter = "Audio Files (*.mp3;*.wav)|*.mp3;*.wav|All files (*.*)|*.*",
+				Title = "选择音频文件位置"
+			};
+
+			if (dialog.ShowDialog() == true)
+			{
+				_settings.AudioPath = dialog.FileName;
+				AudioPathTextBox.Text = dialog.FileName;
+				_settings.SaveSettings();
+				Settings.PlayAudio(dialog.FileName, _settings.Volume);
+			}
+		}
+
+		private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			if (_settings != null)
+			{
+				_settings.UpdateVolume(e.NewValue);
+				_settings.SaveSettings();
+			}
+		}
+	}
 }
+
+
