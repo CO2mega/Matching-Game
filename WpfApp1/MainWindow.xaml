@@ -9,6 +9,7 @@
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
         Title="连连看" Height="650" Width="900"
+        Icon="pack://application:,,,/Assets/LLK.ico"
         Background="{DynamicResource ApplicationBackgroundBrush}"
         Foreground="{DynamicResource TextFillColorPrimaryBrush}">
     <Grid>

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="Assets\HOP.png" />
+    <None Remove="Assets\LLK.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Assets\**\*">
@@ -24,6 +25,7 @@
     <Resource Include="Assets\HOP.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Assets\LLK.ico" />
   </ItemGroup>
 
 </Project>

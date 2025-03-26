@@ -12,8 +12,13 @@
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="/Assets/HOP.png" Stretch="UniformToFill" />
+            <ImageBrush ImageSource="pack://application:,,,/Assets/HOP.png" Stretch="UniformToFill" />
         </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
     </Grid>
+
 
 </Page>
