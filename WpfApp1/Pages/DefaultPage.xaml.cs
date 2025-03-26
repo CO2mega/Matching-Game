@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
-
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 namespace WpfApp1.Pages;
 
 /// <summary>
@@ -7,8 +8,8 @@ namespace WpfApp1.Pages;
 /// </summary>
 public partial class DefaultPage : Page
 {
-    public DefaultPage()
-    {
-        InitializeComponent();
-    }
+	public DefaultPage()
+	{
+		InitializeComponent();
+	}
 }

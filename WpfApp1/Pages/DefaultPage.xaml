@@ -18,7 +18,52 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
+        <TextBlock x:Name="TitleTextBlock" Grid.Row="0" Text="开心连连看" FontSize="72" FontWeight="ExtraBold"  HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock.Foreground>
+                <LinearGradientBrush SpreadMethod="Repeat">
+                    <LinearGradientBrush.Transform>
+                        <TranslateTransform x:Name="LinearGradientBrushTranslate" />
+                    </LinearGradientBrush.Transform>
+                    <LinearGradientBrush.GradientStops>
+                        <GradientStop Offset="0.00" Color="#FF0000" /> <!-- Red -->
+                        <GradientStop Offset="0.10" Color="#FF7F00" /> <!-- Orange -->
+                        <GradientStop Offset="0.20" Color="#FFFF00" /> <!-- Yellow -->
+                        <GradientStop Offset="0.30" Color="#7FFF00" /> <!-- Chartreuse Green -->
+                        <GradientStop Offset="0.40" Color="#00FF00" /> <!-- Green -->
+                        <GradientStop Offset="0.50" Color="#00FF7F" /> <!-- Spring Green -->
+                        <GradientStop Offset="0.60" Color="#00FFFF" /> <!-- Cyan -->
+                        <GradientStop Offset="0.70" Color="#007FFF" /> <!-- Azure -->
+                        <GradientStop Offset="0.80" Color="#0000FF" /> <!-- Blue -->
+                        <GradientStop Offset="0.90" Color="#7F00FF" /> <!-- Violet -->
+                        <GradientStop Offset="1.00" Color="#FF00FF" /> <!-- Magenta -->
+                    </LinearGradientBrush.GradientStops>
+                </LinearGradientBrush>
+            </TextBlock.Foreground>
+            <TextBlock.Triggers>
+                <EventTrigger RoutedEvent="TextBlock.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                RepeatBehavior="Forever"
+                                Storyboard.TargetName="LinearGradientBrushTranslate"
+                                Storyboard.TargetProperty="X"
+                                From="0"
+                                To="4000"
+                                Duration="0:0:20" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </TextBlock.Triggers>
+            <TextBlock.Effect>
+                <DropShadowEffect
+                    BlurRadius="5"
+                    Direction="0"
+                    Opacity="1"
+                    ShadowDepth="0"
+                    Color="Black" />
+            </TextBlock.Effect>
+        </TextBlock>
+        
     </Grid>
-
-
 </Page>

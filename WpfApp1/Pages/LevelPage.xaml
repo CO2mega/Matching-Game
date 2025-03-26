@@ -10,5 +10,9 @@
       ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
       Title="LevelPage">
 
-    <Grid />
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="pack://application:,,,/Assets/fruit_bg.bmp" Stretch="UniformToFill" />
+        </Grid.Background>
+    </Grid>
 </Page>

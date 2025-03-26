@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\fruit_bg.bmp" />
     <None Remove="Assets\HOP.png" />
     <None Remove="Assets\LLK.ico" />
   </ItemGroup>
@@ -22,6 +23,7 @@
     <PackageReference Include="WPF-UI" Version="4.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Assets\fruit_bg.bmp" />
     <Resource Include="Assets\HOP.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
