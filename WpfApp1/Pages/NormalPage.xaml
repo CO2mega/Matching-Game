@@ -11,5 +11,32 @@
         <Grid.Background>
             <ImageBrush ImageSource="pack://application:,,,/Assets/fruit_bg.bmp" Stretch="UniformToFill" />
         </Grid.Background>
+
+        <!-- Game mode selection and start button -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0">
+            <ComboBox x:Name="GameModeComboBox" Width="200" Margin="0,10">
+                <ComboBoxItem Content="Easy" />
+                <ComboBoxItem Content="Normal" />
+                <ComboBoxItem Content="Hard" />
+            </ComboBox>
+            <Button x:Name="StartGameButton" Content="Start Game" Width="100" Click="StartGameButton_Click" />
+        </StackPanel>
+
+        <!-- Game map grid -->
+        <Grid x:Name="GameMapGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Width="640" Height="400">
+            <!-- Define rows and columns for the game map -->
+            <Grid.RowDefinitions>
+                <!-- 16 rows -->
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <!-- ... Add remaining rows -->
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <!-- 10 columns -->
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <!-- ... Add remaining columns -->
+            </Grid.ColumnDefinitions>
+        </Grid>
     </Grid>
 </Page>
