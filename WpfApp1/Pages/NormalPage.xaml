@@ -23,32 +23,24 @@
         </StackPanel>
 
         <!-- 游戏地图网格 -->
-        <Grid x:Name="GameMapGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Width="640" Height="400">
-            <!-- 定义游戏地图的行和列 -->
-            <Grid.RowDefinitions>
-                <!-- 16 行 -->
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <!-- ... 添加剩余的行 -->
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <!-- 10 列 -->
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <!-- ... 添加剩余的列 -->
-            </Grid.ColumnDefinitions>
+        <Grid x:Name="GameMapGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="20">
+          
         </Grid>
 
         <!-- 用于在图像之间绘制线条的画布 -->
-        <Canvas x:Name="LineCanvas" HorizontalAlignment="Center" VerticalAlignment="Center" Width="640" Height="400" IsHitTestVisible="False" />
+        <Canvas x:Name="LineCanvas" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
 
-        <!-- 计时器文本块 -->
-        <TextBlock x:Name="TimerTextBlock" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" FontSize="16" Foreground="White" />
+        <!-- 计时器文本块和进度条 -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20">
+            <TextBlock x:Name="TimerTextBlock" FontSize="16" Foreground="White" TextAlignment="Center" />
+            <ProgressBar x:Name="TimeProgressBar" Width="200" Height="20" Maximum="300" />
+        </StackPanel>
 
-        <!-- 控制按钮（暂停、恢复） -->
+        <!-- 控制按钮（暂停、恢复、打乱顺序） -->
         <StackPanel x:Name="ControlButtons" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Visibility="Collapsed">
             <Button x:Name="PauseButton" Content="暂停" Width="100" Click="PauseButton_Click" />
             <Button x:Name="ResumeButton" Content="恢复" Width="100" Visibility="Collapsed" Click="ResumeButton_Click" />
+            <Button x:Name="ShuffleButton" Content="打乱顺序" Width="100" Click="ShuffleButton_Click" />
         </StackPanel>
     </Grid>
 </Page>
