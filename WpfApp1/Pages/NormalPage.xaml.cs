@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.IO;
 
 namespace WpfApp1.Pages;
 
@@ -91,24 +92,65 @@ public partial class NormalPage : Page
 			GameMapGrid.ColumnDefinitions.Add(new ColumnDefinition());
 		}
 
-		// 向网格添加图像
-		Random random = new Random();
-		for (int i = 0; i < rowCount; i++)
+		// 确保总格子数为偶数
+		int totalCells = rowCount * columnCount;
+		if (totalCells % 2 != 0)
 		{
-			for (int j = 0; j < columnCount; j++)
+			throw new InvalidOperationException("Total number of cells must be even.");
+		}
+
+		// 获取图像文件夹中的所有图像
+		var imageFiles = Directory.GetFiles("Assets", "*.png");
+		if (imageFiles.Length == 0)
+		{
+			throw new InvalidOperationException("No images found in the Assets folder.");
+		}
+
+		// 随机分配每个图片的数量，确保每个图片的数量为偶数
+		var random = new Random();
+		var imageDistribution = new int[imageFiles.Length];
+		for (int i = 0; i < totalCells; i++)
+		{
+			int index = random.Next(imageFiles.Length);
+			imageDistribution[index]++;
+		}
+
+		// 确保每个图片的数量为偶数
+		for (int i = 0; i < imageDistribution.Length; i++)
+		{
+			if (imageDistribution[i] % 2 != 0)
 			{
-				Image img = new Image
+				int index = Array.FindIndex(imageDistribution, x => x % 2 != 0 && x != imageDistribution[i]);
+				if (index != -1)
 				{
-					Width = ImageSize,
-					Height = ImageSize,
-					Source = new BitmapImage(new Uri($"pack://application:,,,/Assets/{random.Next(1, 10)}.png")),
-					Stretch = Stretch.Uniform
-				};
-				img.MouseLeftButtonDown += Image_MouseLeftButtonDown;
-				Grid.SetRow(img, i);
-				Grid.SetColumn(img, j);
-				GameMapGrid.Children.Add(img);
+					imageDistribution[i]++;
+					imageDistribution[index]--;
+				}
 			}
+		}
+
+		// 创建图像列表
+		var imageIndices = imageFiles.SelectMany((file, index) => Enumerable.Repeat(index, imageDistribution[index]))
+									 .OrderBy(_ => Guid.NewGuid())
+									 .ToList();
+
+		// 向网格添加图像
+		for (int i = 0; i < totalCells; i++)
+		{
+			int row = i / columnCount;
+			int col = i % columnCount;
+
+			Image img = new Image
+			{
+				Width = ImageSize,
+				Height = ImageSize,
+				Source = new BitmapImage(new Uri($"pack://application:,,,/Assets/Icons/{System.IO.Path.GetFileName(imageFiles[imageIndices[i]])}")),
+				Stretch = Stretch.Uniform
+			};
+			img.MouseLeftButtonDown += Image_MouseLeftButtonDown;
+			Grid.SetRow(img, row);
+			Grid.SetColumn(img, col);
+			GameMapGrid.Children.Add(img);
 		}
 	}
 

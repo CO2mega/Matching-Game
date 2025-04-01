@@ -9,52 +9,52 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\0.png">
+    <Resource Include="Assets\Icons\0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\1.png">
+    <Resource Include="Assets\Icons\1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\2.png">
+    <Resource Include="Assets\Icons\2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\3.png">
+    <Resource Include="Assets\Icons\3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\4.png">
+    <Resource Include="Assets\Icons\4.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\5.png">
+    <Resource Include="Assets\Icons\5.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\6.png">
+    <Resource Include="Assets\Icons\6.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\7.png">
+    <Resource Include="Assets\Icons\7.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\8.png">
+    <Resource Include="Assets\Icons\8.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\9.png">
+    <Resource Include="Assets\Icons\9.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\10.png">
+    <Resource Include="Assets\Icons\10.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\11.png">
+    <Resource Include="Assets\Icons\11.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\12.png">
+    <Resource Include="Assets\Icons\12.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\13.png">
+    <Resource Include="Assets\Icons\13.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\14.png">
+    <Resource Include="Assets\Icons\14.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\15.png">
+    <Resource Include="Assets\Icons\15.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\fruit_bg.bmp" />
