@@ -17,7 +17,7 @@ namespace WpfApp1.Pages
 	{
 		private int rowCount;
 		private int columnCount;
-		private int ImageSize = 20;
+		private int ImageSize = 40;
 		private DispatcherTimer timer;
 		private int timeLeft;
 		private Image firstSelected;
@@ -42,6 +42,10 @@ namespace WpfApp1.Pages
 			SetGameDifficulty();
 			InitializeGameMap();
 			ImageSize = (int)Math.Min((GameMapGrid.Width / columnCount), (GameMapGrid.Height / rowCount));
+			if (ImageSize <= 0)
+			{
+				ImageSize = 40; // 设置一个默认值
+			}
 			GameMapGrid.Visibility = Visibility.Visible;
 			ControlButtons.Visibility = Visibility.Visible; // Show control buttons when game starts
 			StartTimer();
@@ -68,9 +72,13 @@ namespace WpfApp1.Pages
 					columnCount = 10;
 					break;
 			}
-			//GameMapGrid.Width = columnCount * ImageSize;
-			//GameMapGrid.Height = rowCount * ImageSize;
-			ImageSize = (int)Math.Min((GameMapGrid.Width/columnCount), (GameMapGrid.Height/rowCount));
+			GameMapGrid.Width = columnCount * ImageSize;
+			GameMapGrid.Height = rowCount * ImageSize;
+			ImageSize = (int)Math.Min((GameMapGrid.Width / columnCount), (GameMapGrid.Height / rowCount));
+			if (ImageSize <= 0)
+			{
+				ImageSize = 40; // 设置一个默认值
+			}
 			LineCanvas.Width = GameMapGrid.Width;
 			LineCanvas.Height = GameMapGrid.Height;
 		}
@@ -94,12 +102,8 @@ namespace WpfApp1.Pages
 				GameMapGrid.ColumnDefinitions.Add(new ColumnDefinition());
 			}
 
-			// 确保总格子数为偶数
 			int totalCells = rowCount * columnCount;
-			if (totalCells % 2 != 0)
-			{
-				throw new InvalidOperationException("Total number of cells must be even.");
-			}
+			
 
 			// 获取图像文件夹中的所有图像
 			var imageFiles = Directory.GetFiles("Assets/Icons", "*.png");
@@ -348,30 +352,92 @@ namespace WpfApp1.Pages
 			int row2 = Grid.GetRow(img2);
 			int col2 = Grid.GetColumn(img2);
 
-			Line line = new Line
-			{
-				X1 = col1 * ImageSize + ImageSize / 2,
-				Y1 = row1 * ImageSize + ImageSize / 2,
-				X2 = col2 * ImageSize + ImageSize / 2,
-				Y2 = row2 * ImageSize + ImageSize / 2,
-				Stroke = Brushes.Red,
-				StrokeThickness = 2
-			};
+			List<Point> pathPoints = GetEliminationPath(row1, col1, row2, col2);
 
-			LineCanvas.Children.Add(line);
-			DispatcherTimer lineTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.2) };
-			lineTimer.Tick += (s, e) =>
+			if (pathPoints.Count > 1)
 			{
-				LineCanvas.Children.Remove(line);
-				lineTimer.Stop();
-			};
-			lineTimer.Start();
+				for (int i = 0; i < pathPoints.Count - 1; i++)
+				{
+					Line line = new Line
+					{
+						X1 = pathPoints[i].X * ImageSize + ImageSize / 2,
+						Y1 = pathPoints[i].Y * ImageSize + ImageSize / 2,
+						X2 = pathPoints[i + 1].X * ImageSize + ImageSize / 2,
+						Y2 = pathPoints[i + 1].Y * ImageSize + ImageSize / 2,
+						Stroke = Brushes.Red,
+						StrokeThickness = 2
+					};
+
+					LineCanvas.Children.Add(line);
+					DispatcherTimer lineTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.1) };
+					lineTimer.Tick += (s, e) =>
+					{
+						LineCanvas.Children.Remove(line);
+						lineTimer.Stop();
+					};
+					lineTimer.Start();
+				}
+			}
+		}
+
+		private List<Point> GetEliminationPath(int row1, int col1, int row2, int col2)
+		{
+			List<Point> pathPoints = new List<Point>();
+
+			if (CanConnectWithOneLine(row1, col1, row2, col2))
+			{
+				pathPoints.Add(new Point(col1, row1));
+				pathPoints.Add(new Point(col2, row2));
+			}
+			else if (CanConnectWithTwoLines(row1, col1, row2, col2))
+			{
+				if (row1 != row2 && col1 != col2)
+				{
+					if (IsEmpty(row1, col1, row1, col2) && IsEmpty(row1, col2, row2, col2))
+					{
+						pathPoints.Add(new Point(col1, row1));
+						pathPoints.Add(new Point(col2, row1));
+						pathPoints.Add(new Point(col2, row2));
+					}
+					else if (IsEmpty(row1, col1, row2, col1) && IsEmpty(row2, col1, row2, col2))
+					{
+						pathPoints.Add(new Point(col1, row1));
+						pathPoints.Add(new Point(col1, row2));
+						pathPoints.Add(new Point(col2, row2));
+					}
+				}
+			}
+			else if (CanConnectWithThreeLines(row1, col1, row2, col2))
+			{
+				for (int row = 0; row < rowCount; row++)
+				{
+					if (row != row1 && row != row2 && IsEmpty(row1, col1, row, col1) && IsEmpty(row, col1, row, col2) && IsEmpty(row, col2, row2, col2))
+					{
+						pathPoints.Add(new Point(col1, row1));
+						pathPoints.Add(new Point(col1, row));
+						pathPoints.Add(new Point(col2, row));
+						pathPoints.Add(new Point(col2, row2));
+						break;
+					}
+				}
+				for (int col = 0; col < columnCount; col++)
+				{
+					if (col != col1 && col != col2 && IsEmpty(row1, col1, row1, col) && IsEmpty(row1, col, row2, col) && IsEmpty(row2, col, row2, col2))
+					{
+						pathPoints.Add(new Point(col1, row1));
+						pathPoints.Add(new Point(col, row1));
+						pathPoints.Add(new Point(col, row2));
+						pathPoints.Add(new Point(col2, row2));
+						break;
+					}
+				}
+			}
+
+			return pathPoints;
 		}
 
 		private bool CanEliminate(int row1, int col1, int row2, int col2)
 		{
-			// 实现游戏规则以检查是否可以消除两个图像
-			// 如果图像可以通过一条、两条或三条线连接，则返回 true
 			return CanConnectWithOneLine(row1, col1, row2, col2) ||
 				   CanConnectWithTwoLines(row1, col1, row2, col2) ||
 				   CanConnectWithThreeLines(row1, col1, row2, col2);
