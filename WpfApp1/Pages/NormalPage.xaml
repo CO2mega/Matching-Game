@@ -23,12 +23,12 @@
         </StackPanel>
 
         <!-- 游戏地图网格 -->
-        <Grid x:Name="GameMapGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="20">
+        <Grid x:Name="GameMapGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="20,20,100,60">
           
         </Grid>
 
         <!-- 用于在图像之间绘制线条的画布 -->
-        <Canvas x:Name="LineCanvas" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+        <Canvas x:Name="LineCanvas" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Margin="20,20,100,60" />
 
         <!-- 计时器文本块和进度条 -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20">

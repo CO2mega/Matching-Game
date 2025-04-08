@@ -31,7 +31,10 @@ namespace WpfApp1.Pages
 			timer.Interval = TimeSpan.FromSeconds(1);
 			timer.Tick += Timer_Tick;
 			GameMapGrid.Visibility = Visibility.Collapsed;
-			ControlButtons.Visibility = Visibility.Collapsed; // Initially hide the control buttons
+			ControlButtons.Visibility = Visibility.Collapsed;
+
+			// 订阅页面的 SizeChanged 事件
+			this.SizeChanged += Page_SizeChanged;
 		}
 
 		private void StartGameButton_Click(object sender, RoutedEventArgs e)
@@ -41,13 +44,9 @@ namespace WpfApp1.Pages
 
 			SetGameDifficulty();
 			InitializeGameMap();
-			ImageSize = (int)Math.Min((GameMapGrid.Width / columnCount), (GameMapGrid.Height / rowCount));
-			if (ImageSize <= 0)
-			{
-				ImageSize = 40; // 设置一个默认值
-			}
+
 			GameMapGrid.Visibility = Visibility.Visible;
-			ControlButtons.Visibility = Visibility.Visible; // Show control buttons when game starts
+			ControlButtons.Visibility = Visibility.Visible;
 			StartTimer();
 		}
 
@@ -72,15 +71,18 @@ namespace WpfApp1.Pages
 					columnCount = 10;
 					break;
 			}
-			GameMapGrid.Width = columnCount * ImageSize;
-			GameMapGrid.Height = rowCount * ImageSize;
-			ImageSize = (int)Math.Min((GameMapGrid.Width / columnCount), (GameMapGrid.Height / rowCount));
-			if (ImageSize <= 0)
+
+			// 初始化 GameMapGrid 的行和列
+			GameMapGrid.RowDefinitions.Clear();
+			GameMapGrid.ColumnDefinitions.Clear();
+			for (int i = 0; i < rowCount; i++)
 			{
-				ImageSize = 40; // 设置一个默认值
+				GameMapGrid.RowDefinitions.Add(new RowDefinition());
 			}
-			LineCanvas.Width = GameMapGrid.Width;
-			LineCanvas.Height = GameMapGrid.Height;
+			for (int j = 0; j < columnCount; j++)
+			{
+				GameMapGrid.ColumnDefinitions.Add(new ColumnDefinition());
+			}
 		}
 
 		private void InitializeGameMap()
@@ -90,9 +92,9 @@ namespace WpfApp1.Pages
 			GameMapGrid.ColumnDefinitions.Clear();
 			firstSelected = null;
 			secondSelected = null;
-			lastClickedPosition = new Point(-1, -1); // Initialize to an invalid position
+			lastClickedPosition = new Point(-1, -1);
 
-			// 定义行和列
+
 			for (int i = 0; i < rowCount; i++)
 			{
 				GameMapGrid.RowDefinitions.Add(new RowDefinition());
@@ -103,7 +105,6 @@ namespace WpfApp1.Pages
 			}
 
 			int totalCells = rowCount * columnCount;
-			
 
 			// 获取图像文件夹中的所有图像
 			var imageFiles = Directory.GetFiles("Assets/Icons", "*.png");
@@ -112,28 +113,31 @@ namespace WpfApp1.Pages
 				throw new InvalidOperationException("No images found in the Assets/Icons folder.");
 			}
 
-			// 分块分配每个图片的数量
-			var imageDistribution = new int[imageFiles.Length];
-			int chunkSize = totalCells / imageFiles.Length;
+			// 确保图片成对分配
+			var imageIndices = new List<int>();
+			int pairsPerImage = totalCells / (imageFiles.Length * 2);
+			int remainingPairs = (totalCells / 2) % imageFiles.Length;
+
 			for (int i = 0; i < imageFiles.Length; i++)
 			{
-				imageDistribution[i] = chunkSize;
+
+				for (int j = 0; j < pairsPerImage * 2; j++)
+
+					imageIndices.Add(i);
+
+
+
+				if (remainingPairs > 0)
+				{
+					imageIndices.Add(i);
+					imageIndices.Add(i);
+					remainingPairs--;
+				}
 			}
 
-			// 如果总格子数不能被图像数整除，分配剩余的格子
-			int remainingCells = totalCells % imageFiles.Length;
+			// 随机打乱图片索引
 			var random = new Random();
-			while (remainingCells > 0)
-			{
-				int index = random.Next(imageFiles.Length);
-				imageDistribution[index] += 2; // 确保每个图片的数量为偶数
-				remainingCells -= 2;
-			}
-
-			// 创建图像列表
-			var imageIndices = imageFiles.SelectMany((file, index) => Enumerable.Repeat(index, imageDistribution[index]))
-										 .OrderBy(_ => Guid.NewGuid())
-										 .ToList();
+			imageIndices = imageIndices.OrderBy(_ => random.Next()).ToList();
 
 			// 向网格添加图像
 			for (int i = 0; i < totalCells; i++)
@@ -347,36 +351,56 @@ namespace WpfApp1.Pages
 
 		private void DrawLineBetweenImages(Image img1, Image img2)
 		{
+			// 获取 GameMapGrid 的单元格宽度和高度
+			double cellWidth = GameMapGrid.ActualWidth / columnCount;
+			double cellHeight = GameMapGrid.ActualHeight / rowCount;
+
+			// 获取图像的行列位置
 			int row1 = Grid.GetRow(img1);
 			int col1 = Grid.GetColumn(img1);
 			int row2 = Grid.GetRow(img2);
 			int col2 = Grid.GetColumn(img2);
 
+			// 获取消除路径的点列表
 			List<Point> pathPoints = GetEliminationPath(row1, col1, row2, col2);
 
-			if (pathPoints.Count > 1)
+			// 如果路径点少于 2 个，直接返回
+			if (pathPoints.Count < 2)
 			{
-				for (int i = 0; i < pathPoints.Count - 1; i++)
-				{
-					Line line = new Line
-					{
-						X1 = pathPoints[i].X * ImageSize + ImageSize / 2,
-						Y1 = pathPoints[i].Y * ImageSize + ImageSize / 2,
-						X2 = pathPoints[i + 1].X * ImageSize + ImageSize / 2,
-						Y2 = pathPoints[i + 1].Y * ImageSize + ImageSize / 2,
-						Stroke = Brushes.Red,
-						StrokeThickness = 2
-					};
+				return;
+			}
 
-					LineCanvas.Children.Add(line);
-					DispatcherTimer lineTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.1) };
-					lineTimer.Tick += (s, e) =>
-					{
-						LineCanvas.Children.Remove(line);
-						lineTimer.Stop();
-					};
-					lineTimer.Start();
-				}
+			// 遍历路径点，逐段绘制线条
+			for (int i = 0; i < pathPoints.Count - 1; i++)
+			{
+				// 计算每个点的实际位置
+				double x1 = pathPoints[i].X * cellWidth + cellWidth / 2;
+				double y1 = pathPoints[i].Y * cellHeight + cellHeight / 2;
+				double x2 = pathPoints[i + 1].X * cellWidth + cellWidth / 2;
+				double y2 = pathPoints[i + 1].Y * cellHeight + cellHeight / 2;
+
+				// 创建线条
+				Line line = new Line
+				{
+					X1 = x1,
+					Y1 = y1,
+					X2 = x2,
+					Y2 = y2,
+					Stroke = Brushes.Red,
+					StrokeThickness = 2
+				};
+
+				// 将线条添加到 LineCanvas
+				LineCanvas.Children.Add(line);
+
+				// 设置定时器移除线条
+				DispatcherTimer lineTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.1) };
+				lineTimer.Tick += (s, e) =>
+				{
+					LineCanvas.Children.Remove(line);
+					lineTimer.Stop();
+				};
+				lineTimer.Start();
 			}
 		}
 
@@ -585,6 +609,42 @@ namespace WpfApp1.Pages
 				PauseButton.Visibility = Visibility.Visible;
 				ResumeButton.Visibility = Visibility.Collapsed;
 				GameMapGrid.Visibility = Visibility.Visible;
+			}
+		}
+		private void GameMapGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			// 同步 LineCanvas 的大小
+			LineCanvas.Width = GameMapGrid.ActualWidth;
+			LineCanvas.Height = GameMapGrid.ActualHeight;
+
+			// 如果需要，可以在这里重新计算 ImageSize
+			if (rowCount > 0 && columnCount > 0)
+			{
+				ImageSize = (int)Math.Min((GameMapGrid.ActualWidth / columnCount), (GameMapGrid.ActualHeight / rowCount));
+				if (ImageSize <= 0)
+				{
+					ImageSize = 40; // 设置一个默认值
+				}
+			}
+		}
+		private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			
+			GameMapGrid.Width = e.NewSize.Width * 0.8;
+			GameMapGrid.Height = e.NewSize.Height * 0.8; 
+
+			
+			LineCanvas.Width = GameMapGrid.Width;
+			LineCanvas.Height = GameMapGrid.Height;
+
+		
+			if (rowCount > 0 && columnCount > 0)
+			{
+				ImageSize = (int)Math.Min((GameMapGrid.Width / columnCount), (GameMapGrid.Height / rowCount));
+				if (ImageSize <= 0)
+				{
+					ImageSize = 40; 
+				}
 			}
 		}
 	}
