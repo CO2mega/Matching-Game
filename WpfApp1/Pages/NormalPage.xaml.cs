@@ -45,6 +45,9 @@ namespace WpfApp1.Pages
 			SetGameDifficulty();
 			InitializeGameMap();
 
+			TimeProgressBar.Maximum = 300; 
+			TimeProgressBar.Value = 300;
+
 			GameMapGrid.Visibility = Visibility.Visible;
 			ControlButtons.Visibility = Visibility.Visible;
 			StartTimer();
@@ -54,15 +57,15 @@ namespace WpfApp1.Pages
 		{
 			switch (GameModeComboBox.SelectedIndex)
 			{
-				case 0: // 简单
+				case 0:
 					rowCount = 8;
 					columnCount = 8;
 					break;
-				case 1: // 普通
+				case 1:
 					rowCount = 12;
 					columnCount = 12;
 					break;
-				case 2: // 困难
+				case 2: 
 					rowCount = 16;
 					columnCount = 16;
 					break;
@@ -188,10 +191,10 @@ namespace WpfApp1.Pages
 			int clickedRow = Grid.GetRow(clickedImage);
 			int clickedColumn = Grid.GetColumn(clickedImage);
 
-			// 检查是否点击了相同的位置
+			
 			if (lastClickedPosition.X == clickedRow && lastClickedPosition.Y == clickedColumn)
 			{
-				// 如果点击了相同的位置，则重置选择
+				
 				if (firstSelected != null)
 				{
 					RemoveBorderEffect(firstSelected);
@@ -308,7 +311,11 @@ namespace WpfApp1.Pages
 					if (GameMapGrid.Children.OfType<Image>().Count() == 0)
 					{
 						timer.Stop();
-						MessageBox.Show($"你胜利了！用时: {300 - timeLeft} 秒");
+						// 显示确认对话框
+						if (MessageBox.Show($"你胜利了！用时: {300 - timeLeft} 秒\n是否重新开始？", "游戏胜利", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+						{
+							ResetGame(); // 用户确认后重置游戏
+						}
 					}
 				}
 
@@ -497,7 +504,7 @@ namespace WpfApp1.Pages
 
 		private bool CanConnectWithTwoLines(int row1, int col1, int row2, int col2)
 		{
-			// 检查两个图像是否可以通过两条线连接
+			
 			if (row1 != row2 && col1 != col2)
 			{
 				return (IsEmpty(row1, col1, row1, col2) && IsEmpty(row1, col2, row2, col2)) ||
@@ -508,7 +515,7 @@ namespace WpfApp1.Pages
 
 		private bool CanConnectWithThreeLines(int row1, int col1, int row2, int col2)
 		{
-			// 检查两个图像是否可以通过三条线连接
+			
 			for (int row = 0; row < rowCount; row++)
 			{
 				if (row != row1 && row != row2 && IsEmpty(row1, col1, row, col1) && IsEmpty(row, col1, row, col2) && IsEmpty(row, col2, row2, col2))
@@ -580,13 +587,21 @@ namespace WpfApp1.Pages
 			if (timeLeft > 0)
 			{
 				timeLeft--;
+
+				// 更新计时器文本
 				TimerTextBlock.Text = $"剩余时间: {timeLeft / 60:D2}:{timeLeft % 60:D2}";
+
+				// 更新进度条
+				TimeProgressBar.Value = timeLeft;
 			}
 			else
 			{
 				timer.Stop();
-				MessageBox.Show("时间到！");
-				// 处理游戏结束逻辑
+				// 显示确认对话框
+				if (MessageBox.Show("时间到！是否重新开始？", "游戏结束", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+				{
+					ResetGame(); // 用户确认后重置游戏
+				}
 			}
 		}
 
@@ -613,17 +628,17 @@ namespace WpfApp1.Pages
 		}
 		private void GameMapGrid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			// 同步 LineCanvas 的大小
+			
 			LineCanvas.Width = GameMapGrid.ActualWidth;
 			LineCanvas.Height = GameMapGrid.ActualHeight;
 
-			// 如果需要，可以在这里重新计算 ImageSize
+			
 			if (rowCount > 0 && columnCount > 0)
 			{
 				ImageSize = (int)Math.Min((GameMapGrid.ActualWidth / columnCount), (GameMapGrid.ActualHeight / rowCount));
 				if (ImageSize <= 0)
 				{
-					ImageSize = 40; // 设置一个默认值
+					ImageSize = 40; 
 				}
 			}
 		}
@@ -646,6 +661,34 @@ namespace WpfApp1.Pages
 					ImageSize = 40; 
 				}
 			}
+		}
+		private void ResetGame()
+		{
+			// 停止计时器
+			timer.Stop();
+
+			// 重置计时器和进度条
+			timeLeft = 300; // 示例：5 分钟
+			TimeProgressBar.Value = TimeProgressBar.Maximum;
+
+			// 清空选择状态
+			firstSelected = null;
+			secondSelected = null;
+			lastClickedPosition = new Point(-1, -1);
+
+			// 清空游戏网格
+			GameMapGrid.Children.Clear();
+			GameMapGrid.RowDefinitions.Clear();
+			GameMapGrid.ColumnDefinitions.Clear();
+
+			// 重置 UI 状态
+			GameModeComboBox.Visibility = Visibility.Visible;
+			StartGameButton.Visibility = Visibility.Visible;
+			GameMapGrid.Visibility = Visibility.Collapsed;
+			ControlButtons.Visibility = Visibility.Collapsed;
+
+			// 清空绘制的线条
+			LineCanvas.Children.Clear();
 		}
 	}
 }

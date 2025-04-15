@@ -58,7 +58,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\fruit_bg.bmp" />
-    <Resource Include="Assets\HOP.png">
+    <Resource Include="Assets\background.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\LLK.ico" />
