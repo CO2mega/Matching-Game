@@ -307,14 +307,20 @@ namespace WpfApp1.Pages
 					AddEmptyGridCell(row1, col1);
 					AddEmptyGridCell(row2, col2);
 
-					// 检查是否所有图像都已消除
+					
 					if (GameMapGrid.Children.OfType<Image>().Count() == 0)
 					{
 						timer.Stop();
 						// 显示确认对话框
-						if (MessageBox.Show($"你胜利了！用时: {300 - timeLeft} 秒\n是否重新开始？", "游戏胜利", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+						var result = MessageBox.Show($"你胜利了！用时: {300 - timeLeft} 秒\n是否重新开始？", "游戏胜利", MessageBoxButton.YesNo, MessageBoxImage.Question);
+						if (result == MessageBoxResult.Yes)
 						{
 							ResetGame(); // 用户确认后重置游戏
+						}
+						else if (result == MessageBoxResult.No)
+						{
+							// 结束游戏，返回主页面或关闭窗口
+							Application.Current.Shutdown(); // 关闭应用程序
 						}
 					}
 				}
@@ -598,9 +604,15 @@ namespace WpfApp1.Pages
 			{
 				timer.Stop();
 				// 显示确认对话框
-				if (MessageBox.Show("时间到！是否重新开始？", "游戏结束", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+				var result = MessageBox.Show("时间到！是否重新开始？", "游戏结束", MessageBoxButton.YesNo, MessageBoxImage.Question);
+				if (result == MessageBoxResult.Yes)
 				{
 					ResetGame(); // 用户确认后重置游戏
+				}
+				else if (result == MessageBoxResult.No)
+				{
+					// 结束游戏，返回主页面或关闭窗口
+					Application.Current.Shutdown(); // 关闭应用程序
 				}
 			}
 		}
